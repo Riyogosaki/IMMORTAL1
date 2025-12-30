@@ -8,18 +8,34 @@ import messageRoutes from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
 import mongoose from "mongoose";
 
-
 dotenv.config();
-const PORT =5001;
-app.use(express.json());
-app.use(cookieParser());
+const PORT = 5001;
+
+/* ======================
+   ✅ CORS FIRST (IMPORTANT)
+====================== */
 app.use(
   cors({
     origin: "https://immortal-2.vercel.app",
-    credentials: true
+    credentials: true,
   })
 );
 
+/* ======================
+   ✅ BODY & COOKIES
+====================== */
+app.use(express.json());
+app.use(cookieParser());
+
+/* ======================
+   ✅ ROUTES
+====================== */
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
+
+/* ======================
+   ✅ SERVER
+====================== */
 const connectDb = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
@@ -28,8 +44,6 @@ const connectDb = async () => {
     console.log("DB error:", error);
   }
 };
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
 
 server.listen(PORT, () => {
   connectDb();
