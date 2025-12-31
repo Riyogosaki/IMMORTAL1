@@ -4,34 +4,42 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import authRoutes from "./routes/auth.route.js";
-import messageRoutes from "./routes/message.route.js";
-import { app, server } from "./lib/socket.js";
-import mongoose from "mongoose";
+import { connectDB } from "./lib/db.js";
 
 dotenv.config();
-const PORT = process.env.PORT ||5001;
+
+const app = express();
+const PORT = process.env.PORT || 5001;
+
+// ------------------- MIDDLEWARE -------------------
+app.use(express.json({ limit: "10mb" })); // for large profilePic uploads
+app.use(cookieParser());
 
 app.use(
   cors({
     origin: "https://immortal-2.vercel.app",
-    credentials: true,
+    credentials: true, // allow cookies
   })
 );
-app.use(cookieParser());
-app.use(express.json());
 
+// ------------------- ROUTES -------------------
 app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
 
-const connectDb = async () => {
+// ------------------- DEFAULT ROUTE -------------------
+app.get("/", (req, res) => {
+  res.send("Server is running...");
+});
+
+// ------------------- START SERVER -------------------
+const startServer = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB connected");
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   } catch (error) {
-    console.log("DB error:", error);
+    console.error("Failed to start server:", error);
   }
 };
 
-server.listen(PORT, () => {
-  connectDb();
-});
+startServer();

@@ -2,44 +2,31 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
-
-    fullName: {
-      type: String,
-      required: true,
-    },
-
     password: {
       type: String,
       required: true,
       minlength: 6,
     },
-
     profilePic: {
       type: String,
-      default: "",
-    },
-
-    // 🔐 EMAIL VERIFICATION (OTP)
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-
-    emailOtp: {
-      type: String,
-    },
-
-    emailOtpExpiry: {
-      type: Date,
+      default: "", // optional profile picture
     },
   },
   { timestamps: true }
 );
 
 const User = mongoose.model("User", userSchema);
+
 export default User;
