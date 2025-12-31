@@ -10,7 +10,7 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
@@ -26,18 +26,16 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
     });
+if (newUser) {
+  await newUser.save(); // ✅ save first
+  generateToken(newUser._id, res); // ✅ then create token
 
-    if (newUser) {
-      // generate jwt token here
-      generateToken(newUser._id, res);
-      await newUser.save();
-
-      res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
-      });
+  res.status(201).json({
+    _id: newUser._id,
+    fullName: newUser.fullName,
+    email: newUser.email,
+    profilePic: newUser.profilePic,
+  });
     } else {
       res.status(400).json({ message: "Invalid user data" });
     }
