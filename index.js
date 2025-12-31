@@ -9,33 +9,20 @@ import { app, server } from "./lib/socket.js";
 import mongoose from "mongoose";
 
 dotenv.config();
-const PORT = 5001;
+const PORT = process.env.PORT ||5001;
 
-/* ======================
-   ✅ CORS FIRST (IMPORTANT)
-====================== */
 app.use(
   cors({
     origin: "https://immortal-2.vercel.app",
     credentials: true,
   })
 );
-
-/* ======================
-   ✅ BODY & COOKIES
-====================== */
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
 
-/* ======================
-   ✅ ROUTES
-====================== */
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-/* ======================
-   ✅ SERVER
-====================== */
 const connectDb = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
